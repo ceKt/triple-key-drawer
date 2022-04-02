@@ -1,3 +1,4 @@
-Django==3.2.*
-uwsgi
+Django==3.2.7
+uwsgi==2.0.19
 mysqlclient
+autopep8

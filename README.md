@@ -14,7 +14,3 @@ $ docker-compose up -d
 $ docker-compose exec app ./manage.py migrate
 ```
 
-### Djangoプロジェクト起動
-```
-$ docker-compose exec app /workspace/manage.py runserver
-```

@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  db:
+    image: mariadb:10.6 #MariaDBのバージョン10.6のイメージを持ってくる
+    container_name: mariadb_10_6
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: djangoapp
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/sql:/docker-entrypoint-initdb.d
+    
+  nginx:
+    image: nginx:1.20.2
+    container_name: nginx_1_20_2
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params
+      - ./nginx/log:/var/log/nginx
+      - ./static/log:/static
+    depends_on:
+      - python
+    
+  python:
+    build: ./python #この中のDockerfileをもとにイメージを構築するらしい
+    container_name: python3
+    command: uwsgi --socket :8001 --module ${PROJECT_NAME}.wsgi --logto /tmp/uwsgi.log #起動した際に実行される
+    volumes:
+      - ./src:/code
+      - ./static:/static
+    expose:
+      - "8001"
+    depends_on:
+      - db
